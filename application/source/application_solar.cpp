@@ -8,6 +8,7 @@
 #include <glbinding/gl/gl.h>
 // use gl definitions from glbinding 
 using namespace gl;
+typedef std::shared_ptr<Node> node_ptr;
 
 //dont load gl bindings from glfw
 #define GLFW_INCLUDE_NONE
@@ -22,6 +23,7 @@ using namespace gl;
 ApplicationSolar::ApplicationSolar(std::string const& resource_path)
  :Application{resource_path}
  ,planet_object{}
+ ,scene_graph{}
  ,m_view_transform{glm::translate(glm::fmat4{}, glm::fvec3{0.0f, 0.0f, 4.0f})}
  ,m_view_projection{utils::calculate_projection_matrix(initial_aspect_ratio)}
 {
@@ -93,8 +95,9 @@ void ApplicationSolar::initializeShaderPrograms() {
 }
 
 // load models
-void ApplicationSolar::initializeGeometry() {
-  model planet_model = model_loader::obj(m_resource_path + "models/sphere.obj", model::NORMAL);
+void ApplicationSolar::initializeGeometry(model& planet_model) {
+  // model planet_model = model_loader::obj(m_resource_path + "models/sphere.obj", model::NORMAL);
+  planet_model = model_loader::obj(m_resource_path + "models/sphere.obj", model::NORMAL);
 
   // generate vertex array object
   glGenVertexArrays(1, &planet_object.vertex_AO);
@@ -128,6 +131,70 @@ void ApplicationSolar::initializeGeometry() {
   planet_object.draw_mode = GL_TRIANGLES;
   // transfer number of indices to model object 
   planet_object.num_elements = GLsizei(planet_model.indices.size());
+}
+
+//--- init_functions for creating things
+// Scene Graph
+void ApplicationSolar::init_scene_graph() {
+  model planet_model;
+  initializeGeometry(planet_model);
+
+  Node root("root");
+  scene_graph.setName("SceneGraph_1");
+  scene_graph.setRoot(root);
+
+  init_camera("cam_1");
+  init_sun("sun", planet_model);
+  init_planet("mercury", planet_model);
+  init_planet("venus", planet_model);
+  init_planet("earth", planet_model);
+  init_planet("mars", planet_model);
+  init_planet("jupiter", planet_model);
+  init_planet("saturn", planet_model);
+  init_planet("uranus", planet_model);
+  init_planet("neptune", planet_model);
+
+  init_moon("earth", "moon_of_earth");
+
+}
+// camera
+void ApplicationSolar::init_camera(std::string const& name) {
+  glm::fmat4 cam_projection_matrix = glm::fmat4(1.0f);
+  CameraNode camera(name, true, true, cam_projection_matrix);
+  auto camera_ptr = std::make_shared<Node>(camera);         // create pointer to camera
+
+  scene_graph.getRoot().addChildren(camera_ptr);
+  set_m_ViewTransform(cam_projection_matrix);
+}
+// create sun
+void ApplicationSolar::init_sun(std::string const& name, model const& model) {
+  Node sun(name);
+  auto sun_ptr = std::make_shared<Node>(sun);
+  scene_graph.getRoot().addChildren(sun_ptr);
+
+  GeometryNode sun_geo(name + "_geo", model);
+  auto sun_geo_ptr = std::make_shared<Node>(sun_geo);
+  sun.addChildren(sun_geo_ptr);
+}
+// create planet
+void ApplicationSolar::init_planet(std::string const& name, model const& model) {
+  Node planet(name);
+  auto planet_ptr = std::make_shared<Node>(planet);
+  scene_graph.getRoot().addChildren(planet_ptr);
+
+  GeometryNode planet_geo(name + "_geo", model);
+  auto sun_geo_ptr = std::make_shared<Node>(planet_geo);
+  planet.addChildren(sun_geo_ptr);  
+}
+// create moon
+void ApplicationSolar::init_moon(std::string const& planet_name, std::string const& moon_name) {
+  Node moon(moon_name);
+  auto moon_ptr = std::make_shared<Node>(moon);
+  
+  node_ptr planet = scene_graph.getRoot().getChildren(planet_name);
+  if(planet != nullptr) {
+    (*planet).addChildren(moon_ptr);
+  }
 }
 
 ///////////////////////////// callback functions for window events ////////////

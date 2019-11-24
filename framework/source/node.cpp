@@ -10,11 +10,16 @@ Node::Node() :  parent_(nullptr),
                 localTransform_(1.0f),      // identity matrix for non_transformation
                 worldTransform_(1.0f)       {}
 
+Node::Node(std::string const& name) :   parent_(nullptr),
+                                        name_(name),
+                                        path_("..." + name),
+                                        depth_(0)   {}
+
 Node::Node(std::string const& name, node_ptr const& parent,
             std::string const& path, int depth) :   parent_(parent),
                                                     name_(name),
                                                     path_(path),
-                                                    depth_(depth)       {}
+                                                    depth_(depth)     {}
 
 Node::~Node() {}
 

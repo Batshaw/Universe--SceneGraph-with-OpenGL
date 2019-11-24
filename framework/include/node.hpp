@@ -13,6 +13,7 @@ class Node {
     public:
         // Constructors
         Node();
+        Node(std::string const& name);
         Node(std::string const& name, node_ptr const& parent, std::string const& path, int depth);
 
         ~Node();

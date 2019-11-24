@@ -1,6 +1,9 @@
 #ifndef SCENE_GRAPH_HPP
 #define SCENE_GRAPH_HPP
 
+#include "camera_node.hpp"
+#include "geometry_node.hpp"
+
 #include <string>
 #include <node.hpp>
 
@@ -13,6 +16,10 @@ class SceneGraph {
                 scenegraph_instance = new SceneGraph;
             return scenegraph_instance;
         }
+        // Setter:
+        void setName(std::string const& name);
+        void setRoot(Node const& root);
+
         // Getter:
         std::string getName();
         Node getRoot();
@@ -25,9 +32,6 @@ class SceneGraph {
         // member variables
         std::string name_;
         Node root_;
-        // member function
-        void setName(std::string const& name);
-        void setRoot(Node const& root);
 };
 
 
