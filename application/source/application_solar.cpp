@@ -75,8 +75,8 @@ void ApplicationSolar::render_planets(std::list<Node*> const& scene_children_lis
     if(!children_of_planet.empty()) {
       render_planets(children_of_planet);   // recursive
     }
-    // ignore the holder
-    if(planet_ptr->getDepth() % 2 == 0) {
+    // ignore the holder and camera
+    if(planet_ptr->getDepth() % 2 == 0 || planet_ptr->getName().find("cam") == std::string::npos) {
       //transform of the planet
       glm::fmat4 transform_matrix = compute_transform_matrix(planet_ptr);
       // extra matrix for normal transformation to keep them orthogonal to surface
@@ -204,6 +204,10 @@ void ApplicationSolar::init_planets() {
   scene_graph.setName("solar_system");
   scene_graph.setRoot(root_ptr);
 
+  // init cam:
+  CameraNode* cam_1 = new CameraNode();
+  cam_1->setDistanceToOrigin(glm::fvec3{0.0f, 0.0f, 50.0f});
+  root_ptr->addChildren(cam_1);
   // init sun:
   Node* sun_1_ptr = new Node("sun_holder", root_ptr, root_ptr->getPath() + "/sun", 1, nullptr);
   GeometryNode* sun_1_geo_ptr = new GeometryNode("sun", root_ptr, "//root/sun_1", 2, nullptr);
@@ -270,6 +274,17 @@ void ApplicationSolar::init_planets() {
   root_ptr->addChildren(mars_ptr);
   mars_ptr->addChildren(mars_geo_ptr);
 
+    // init moon of mars: phobos
+  Node* phobos_ptr = new Node("phobos_holder", mars_ptr, "/phobos", 3, mars_geo_ptr);
+  GeometryNode* phobos_geo_ptr = new GeometryNode("phobos", mars_ptr, "//root/earth/phobos", 4, mars_geo_ptr);
+  phobos_geo_ptr->setGeometry(planet_model);
+  phobos_geo_ptr->setDistanceToOrigin(glm::fvec3{1.5f, 0.0f, 0.0f});
+  phobos_geo_ptr->setSpeed(0.5f);
+  phobos_geo_ptr->setRadius(0.272f);
+  // add phobos to earth
+  earth_ptr->addChildren(phobos_ptr);
+  phobos_ptr->addChildren(phobos_geo_ptr);
+
   // init 5.jupiter
   Node* jupiter_ptr = new Node("jupiter_holder", root_ptr, root_ptr->getPath() + "/jupiter", 1, sun_1_geo_ptr);
   GeometryNode* jupiter_geo_ptr = new GeometryNode("jupiter", jupiter_ptr, "//root/jupiter", 2, sun_1_geo_ptr);
@@ -318,19 +333,66 @@ void ApplicationSolar::init_planets() {
 ///////////////////////////// callback functions for window events ////////////
 // handle key input
 void ApplicationSolar::keyCallback(int key, int action, int mods) {
-  if (key == GLFW_KEY_W  && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
-    m_view_transform = glm::translate(m_view_transform, glm::fvec3{0.0f, 0.0f, -0.1f});
+/*  float PI = glm::pi<float>();
+  glm::fmat4 local_matrix_origin;
+  for(auto const& planet_ptr : scene_graph.getRoot()->getChildrenList()) {
+    if(planet_ptr->getName().find("sun") != std::string::npos) {
+      local_matrix_origin = planet_ptr->getLocalTransform();
+      break;
+    }
+  }
+*/
+  if (key == GLFW_KEY_Z  && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
+    m_view_transform = glm::translate(m_view_transform, glm::fvec3{0.0f, 0.0f, -0.5f});
+    uploadView();
+  }
+  else if (key == GLFW_KEY_X  && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
+    m_view_transform = glm::translate(m_view_transform, glm::fvec3{0.0f, 0.0f, 0.5f});
+    uploadView();
+  }
+  else if (key == GLFW_KEY_A  && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
+    m_view_transform = glm::translate(m_view_transform, glm::fvec3{-0.5f, 0.0f, 0.0f});
+    uploadView();
+  }
+  else if (key == GLFW_KEY_D  && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
+    m_view_transform = glm::translate(m_view_transform, glm::fvec3{0.5f, 0.0f, 0.0f});
     uploadView();
   }
   else if (key == GLFW_KEY_S  && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
-    m_view_transform = glm::translate(m_view_transform, glm::fvec3{0.0f, 0.0f, 0.1f});
+    m_view_transform = glm::translate(m_view_transform, glm::fvec3{0.0f, -0.5f, 0.0f});
     uploadView();
-  }
+  }     
+  else if (key == GLFW_KEY_W  && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
+    m_view_transform = glm::translate(m_view_transform, glm::fvec3{0.0f, 0.5f, 0.0f});
+    uploadView();
+  }   
 }
 
 //handle delta mouse movement input
 void ApplicationSolar::mouseCallback(double pos_x, double pos_y) {
+/*
+  float PI = glm::pi<float>();
+  glm::fmat4 local_matrix_origin;
+  for(auto const& planet_ptr : scene_graph.getRoot()->getChildrenList()) {
+    if(planet_ptr->getName().find("sun") != std::string::npos) {
+      local_matrix_origin = planet_ptr->getLocalTransform();
+      break;
+    }
+  }
   // mouse handling
+  if(pos_x > 0) {
+    m_view_transform = glm::rotate(m_view_transform, 0.05f * PI, glm::fvec3{0.0f, 1.0f, 0.0f});
+  }
+  else if(pos_x < 0) {
+    m_view_transform = glm::rotate(m_view_transform, -0.05f * PI, glm::fvec3{0.0f, 1.0f, 0.0f});
+  }
+  if(pos_y > 0) {
+    m_view_transform = glm::rotate(m_view_transform, 0.05f * PI, glm::fvec3{1.0f, 0.0f, 0.0f});
+  }
+  else if(pos_y < 0) {
+    m_view_transform = glm::rotate(m_view_transform, -0.05f * PI, glm::fvec3{1.0f, 0.0f, 0.0f});
+  }
+*/
 }
 
 //handle resizing
