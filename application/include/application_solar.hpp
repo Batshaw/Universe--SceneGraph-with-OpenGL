@@ -6,6 +6,8 @@
 #include "structs.hpp"
 #include "scene_graph.hpp"
 
+// typedef std::shared_ptr<Node> node_ptr;
+
 // gpu representation of model
 class ApplicationSolar : public Application {
  public:
@@ -26,7 +28,8 @@ class ApplicationSolar : public Application {
 
  protected:
   void initializeShaderPrograms();
-  void initializeGeometry(model& planet_model);
+  void initializeGeometry();
+  void init_planets();
   // update uniform values
   void uploadUniforms();
   // upload projection matrix
@@ -37,14 +40,13 @@ class ApplicationSolar : public Application {
   void initializeSceneGraph();
   void set_m_ViewTransform(glm::fmat4 const& camera_matrix);
 
-  // creating methods
-  void init_scene_graph();
-  void init_camera(std::string const& name);
-  void init_sun(std::string const& name, model const& model);
-  void init_planet(std::string const& name, model const& model);
-  void init_moon(std::string const& planet_name, std::string const& moon_name);
+  // render methods
+  void render_planets(std::list<Node*> const& planets_list) const;
 
-  //render methods
+  // compute transform matrix
+  glm::fmat4 compute_transform_matrix(Node* const& planet_ptr) const;
+
+
   SceneGraph scene_graph;
 
   // cpu representation of model

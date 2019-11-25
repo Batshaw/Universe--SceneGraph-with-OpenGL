@@ -1,49 +1,60 @@
 #include "node.hpp"
 
-typedef std::shared_ptr<Node> node_ptr;
+// typedef std::shared_ptr<Node> node_ptr;
+
+Node::Node(std::string const& name) : 
+                parent_(nullptr),
+                children_(),
+                name_("root"),
+                path_("//" + name_),
+                depth_(0),
+                localTransform_(glm::fmat4{}),      
+                worldTransform_(glm::fmat4{}),
+                origin_(nullptr)    {}
 
 Node::Node() :  parent_(nullptr),
                 children_(),
-                name_("default_node"),
-                path_("\\" + name_),
+                name_("root"),
+                path_("//" + name_),
                 depth_(0),
-                localTransform_(1.0f),      // identity matrix for non_transformation
-                worldTransform_(1.0f)       {}
+                localTransform_(glm::fmat4{}),      
+                worldTransform_(glm::fmat4{}),
+                origin_(nullptr)       {}
 
-Node::Node(std::string const& name) :   parent_(nullptr),
-                                        name_(name),
-                                        path_("..." + name),
-                                        depth_(0)   {}
-
-Node::Node(std::string const& name, node_ptr const& parent,
-            std::string const& path, int depth) :   parent_(parent),
-                                                    name_(name),
-                                                    path_(path),
-                                                    depth_(depth)     {}
+Node::Node(std::string const& name, Node* const& parent,
+            std::string const& path, int depth, Node* const& origin) :
+        name_(name),
+        parent_(parent),
+        path_(path),
+        depth_(depth),
+        origin_(origin)     {}
 
 Node::~Node() {}
 
-void Node::setParent(node_ptr const& parent) {
+void Node::setParent(Node* const& parent) {
     parent_ = parent;
 }
-void Node::setLocalTransform(glm::mat4 const& localTransform) {
+void Node::setLocalTransform(glm::fmat4 const& localTransform) {
     localTransform_ = localTransform;
 }
-void Node::setWorldTransform(glm::mat4 const& worldTransform) {
+void Node::setWorldTransform(glm::fmat4 const& worldTransform) {
     worldTransform_ = worldTransform;
 }
+void Node::setDistanceToOrigin(glm::fvec3 const& distance_to_origin) {
+    distance_to_origin_ = distance_to_origin;
+}
 
-node_ptr Node::getParent() const {
+Node* Node::getParent() const {
     return parent_;
 }
-node_ptr Node::getChildren(std::string const& child_name) const {
+Node* Node::getChildren(std::string const& child_name) const {
     for(auto const& child : children_) {
         if(child->name_ == child_name)
             return child;
     }
     return nullptr;
 }
-std::list<node_ptr> Node::getChildrenList() const {
+std::list<Node*> Node::getChildrenList() const {
     return children_;
 }
 std::string Node::getName() const {
@@ -55,18 +66,21 @@ std::string Node::getPath() const {
 int Node::getDepth() const {
     return depth_;
 }
-glm::mat4 Node::getLocalTransform() const {
+glm::fmat4 Node::getLocalTransform() const {
     return localTransform_;
 }
-glm::mat4 Node::getWorldTransform() const {
+glm::fmat4 Node::getWorldTransform() const {
     return worldTransform_;
 }
-
-void Node::addChildren(node_ptr const& children) {
-    children_.push_back(children);
+glm::fvec3 Node::getDistanceToOrigin() const {
+    return distance_to_origin_;
 }
-node_ptr Node::removeChildren(std::string const& children_name) {
-    node_ptr removed_child = getChildren(children_name);
+
+void Node::addChildren(Node* const& children) {
+    children_.emplace_back(children);
+}
+Node* Node::removeChildren(std::string const& children_name) {
+    Node* removed_child = getChildren(children_name);
     children_.remove(removed_child);
     return removed_child;
 }

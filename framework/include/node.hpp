@@ -6,7 +6,7 @@
 #include <list>
 #include <glm/glm.hpp>
 
-typedef std::shared_ptr<Node> node_ptr;
+// typedef std::shared_ptr<Node> node_ptr;
 
 class Node {
     
@@ -14,37 +14,41 @@ class Node {
         // Constructors
         Node();
         Node(std::string const& name);
-        Node(std::string const& name, node_ptr const& parent, std::string const& path, int depth);
+        Node(std::string const& name, Node* const& parent, std::string const& path, int depth, Node* const& origin);
 
         ~Node();
 
         // Setter
-        void setParent(node_ptr const& parent);
-        void setLocalTransform(glm::mat4 const& localTransform);
-        void setWorldTransform(glm::mat4 const& worldTransform);
+        void setParent(Node* const& parent);
+        void setLocalTransform(glm::fmat4 const& localTransform);
+        void setWorldTransform(glm::fmat4 const& worldTransform);
+        void setDistanceToOrigin(glm::fvec3 const& distance_to_origin);
 
 
         // Getter
-        node_ptr getParent() const;
-        node_ptr getChildren(std::string const& child_name) const;
-        std::list<node_ptr> getChildrenList() const;
+        Node* getParent() const;
+        Node* getChildren(std::string const& child_name) const;
+        std::list<Node*> getChildrenList() const;
         std::string getName() const;
         std::string getPath() const;
         int getDepth() const;
-        glm::mat4 getLocalTransform() const;
-        glm::mat4 getWorldTransform() const;
+        glm::fmat4 getLocalTransform() const;
+        glm::fmat4 getWorldTransform() const;
+        glm::fvec3 getDistanceToOrigin() const;
 
-        void addChildren(node_ptr const& children);
-        node_ptr removeChildren(std::string const& children_name);
+        void addChildren(Node* const& children);
+        Node* removeChildren(std::string const& children_name);
 
     private:
-        node_ptr parent_;
-        std::list<node_ptr> children_;
+        Node* parent_;
+        Node* origin_;
+        std::list<Node*> children_;
         std::string name_;
         std::string path_;
         int depth_;
-        glm::mat4 localTransform_;
-        glm::mat4 worldTransform_;
+        glm::fmat4 localTransform_;
+        glm::fmat4 worldTransform_;
+        glm::fvec3 distance_to_origin_;
         
 };
 

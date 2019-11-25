@@ -9,7 +9,8 @@ class GeometryNode : public Node {
 
         public:
             // Constructors
-            GeometryNode(std::string const& name, model const& geometry);
+            GeometryNode();
+            GeometryNode(std::string const& name, Node* const& parent, std::string const& path, int depth, Node* const& origin);
             ~GeometryNode();
 
             void setGeometry(model const& geometry);
