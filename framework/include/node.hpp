@@ -23,6 +23,8 @@ class Node {
         void setLocalTransform(glm::fmat4 const& localTransform);
         void setWorldTransform(glm::fmat4 const& worldTransform);
         void setDistanceToOrigin(glm::fvec3 const& distance_to_origin);
+        void setSpeed(float const& speed);
+        void setRadius(float const& radius);
 
 
         // Getter
@@ -35,6 +37,9 @@ class Node {
         glm::fmat4 getLocalTransform() const;
         glm::fmat4 getWorldTransform() const;
         glm::fvec3 getDistanceToOrigin() const;
+        Node* getOrigin() const;
+        float getSpeed() const;
+        float getRadius() const;
 
         void addChildren(Node* const& children);
         Node* removeChildren(std::string const& children_name);
@@ -49,6 +54,8 @@ class Node {
         glm::fmat4 localTransform_;
         glm::fmat4 worldTransform_;
         glm::fvec3 distance_to_origin_;
+        float speed_;
+        float radius_;
         
 };
 

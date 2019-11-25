@@ -38,7 +38,6 @@ class ApplicationSolar : public Application {
   void uploadView();
 
   void initializeSceneGraph();
-  void set_m_ViewTransform(glm::fmat4 const& camera_matrix);
 
   // render methods
   void render_planets(std::list<Node*> const& planets_list) const;

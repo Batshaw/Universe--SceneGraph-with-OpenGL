@@ -31,6 +31,7 @@ Node::Node(std::string const& name, Node* const& parent,
 
 Node::~Node() {}
 
+// Setter
 void Node::setParent(Node* const& parent) {
     parent_ = parent;
 }
@@ -43,7 +44,14 @@ void Node::setWorldTransform(glm::fmat4 const& worldTransform) {
 void Node::setDistanceToOrigin(glm::fvec3 const& distance_to_origin) {
     distance_to_origin_ = distance_to_origin;
 }
+void Node::setSpeed(float const& speed) {
+    speed_ = speed;
+}
+void Node::setRadius(float const& radius) {
+    radius_ = radius;
+}
 
+// Getter
 Node* Node::getParent() const {
     return parent_;
 }
@@ -75,7 +83,17 @@ glm::fmat4 Node::getWorldTransform() const {
 glm::fvec3 Node::getDistanceToOrigin() const {
     return distance_to_origin_;
 }
+Node* Node::getOrigin() const {
+    return origin_;
+}
+float Node::getSpeed() const {
+    return speed_;
+}
+float Node::getRadius() const {
+    return radius_;
+}
 
+//lakjsdhaslkhdasd
 void Node::addChildren(Node* const& children) {
     children_.emplace_back(children);
 }

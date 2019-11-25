@@ -24,7 +24,7 @@ ApplicationSolar::ApplicationSolar(std::string const& resource_path)
  :Application{resource_path}
  ,planet_object{}
  ,scene_graph{}
- ,m_view_transform{glm::translate(glm::fmat4{}, glm::fvec3{0.0f, 0.0f, 4.0f})}
+ ,m_view_transform{glm::translate(glm::fmat4{}, glm::fvec3{0.0f, 0.0f, 50.0f})}
  ,m_view_projection{utils::calculate_projection_matrix(initial_aspect_ratio)}
 {
   initializeGeometry();
@@ -99,15 +99,22 @@ void ApplicationSolar::render_planets(std::list<Node*> const& scene_children_lis
 glm::fmat4 ApplicationSolar::compute_transform_matrix(Node* const& planet_ptr) const {
   glm::fmat4 transform_matrix = planet_ptr->getWorldTransform();
 
-/*  if(planet_ptr->getDepth() == 4) {
-
+  // moon's rotation around its origin
+  if(planet_ptr->getDepth() == 4) {
+    glm::fmat4 origin_matrix = planet_ptr->getOrigin()->getLocalTransform();
+    transform_matrix = glm::rotate(origin_matrix, float(glfwGetTime() * planet_ptr->getOrigin()->getSpeed()), glm::fvec3{0.0f, 1.0f, 0.0f});
+    transform_matrix = glm::translate(transform_matrix, -1.0f * planet_ptr->getOrigin()->getDistanceToOrigin());
   }
-*/
+
   // rotation around parent_planet
-  transform_matrix = glm::rotate(transform_matrix, float(glfwGetTime()), glm::fvec3{0.0f, 1.0f, 0.0f});
+  transform_matrix = glm::rotate(transform_matrix * planet_ptr->getLocalTransform(), float(glfwGetTime() * planet_ptr->getSpeed()), glm::fvec3{0.0f, 1.0f, 0.0f});
   transform_matrix = glm::translate(transform_matrix, -1.0f * planet_ptr->getDistanceToOrigin());
   // rotation around itself
-  //transform_matrix = glm::rotate(transform_matrix, float(glfwGetTime()), glm::fvec3{0.0f, 1.0f, 0.0f});
+  transform_matrix = glm::rotate(transform_matrix, float(glfwGetTime()), glm::fvec3{0.0f, 1.0f, 0.0f});
+
+  // scale to fix the size of planets
+  glm::fvec3 scale_vector = {planet_ptr->getRadius(), planet_ptr->getRadius(), planet_ptr->getRadius()};
+  transform_matrix = glm::scale(transform_matrix, scale_vector);
 
   return transform_matrix;
 }
@@ -193,30 +200,119 @@ void ApplicationSolar::init_planets() {
 
   // init root: default Node creats root Node
   Node* root_ptr = new Node();
+    // init Scene Graph
+  scene_graph.setName("solar_system");
+  scene_graph.setRoot(root_ptr);
 
   // init sun:
   Node* sun_1_ptr = new Node("sun_holder", root_ptr, root_ptr->getPath() + "/sun", 1, nullptr);
   GeometryNode* sun_1_geo_ptr = new GeometryNode("sun", root_ptr, "//root/sun_1", 2, nullptr);
   sun_1_geo_ptr->setGeometry(planet_model);
   sun_1_geo_ptr->setDistanceToOrigin(glm::fvec3{0.0f, 0.0f, 0.0f});
+  sun_1_geo_ptr->setSpeed(0.0f);
+  sun_1_geo_ptr->setRadius(5.0f);
   // add sun to root
   root_ptr->addChildren(sun_1_ptr);
   sun_1_ptr->addChildren(sun_1_geo_ptr);
 
-  //init earth TEST:
+  // init 1.mercury
+  Node* mecury_ptr = new Node("mecury_holder", root_ptr, root_ptr->getPath() + "/mecury", 1, sun_1_geo_ptr);
+  GeometryNode* mecury_geo_ptr = new GeometryNode("mecury", mecury_ptr, "//root/mecury", 2, sun_1_geo_ptr);
+  mecury_geo_ptr->setGeometry(planet_model);
+  mecury_geo_ptr->setDistanceToOrigin(glm::fvec3{8.0f, 0.0f, 0.0f});
+  mecury_geo_ptr->setSpeed(0.2f);
+  mecury_geo_ptr->setRadius(0.385f);
+  // add mecury to root
+  root_ptr->addChildren(mecury_ptr);
+  mecury_ptr->addChildren(mecury_geo_ptr);
+
+  // init 2.venus
+  Node* venus_ptr = new Node("venus_holder", root_ptr, root_ptr->getPath() + "/venus", 1, sun_1_geo_ptr);
+  GeometryNode* venus_geo_ptr = new GeometryNode("venus", venus_ptr, "//root/venus", 2, sun_1_geo_ptr);
+  venus_geo_ptr->setGeometry(planet_model);
+  venus_geo_ptr->setDistanceToOrigin(glm::fvec3{14.0f, 0.0f, 0.0f});
+  venus_geo_ptr->setSpeed(0.15f);
+  venus_geo_ptr->setRadius(0.95f);
+  // add venus to root
+  root_ptr->addChildren(venus_ptr);
+  venus_ptr->addChildren(venus_geo_ptr);
+
+  // init 3.earth TEST:
   Node* earth_ptr = new Node("earth_holder", root_ptr, root_ptr->getPath() + "/earth", 1, sun_1_geo_ptr);
   GeometryNode* earth_geo_ptr = new GeometryNode("earth", earth_ptr, "//root/earth", 2, sun_1_geo_ptr);
   earth_geo_ptr->setGeometry(planet_model);
   earth_geo_ptr->setDistanceToOrigin(glm::fvec3{20.0f, 0.0f, 0.0f});
+  earth_geo_ptr->setSpeed(0.1f);
+  earth_geo_ptr->setRadius(1.0f);
+  // add earth to root
   root_ptr->addChildren(earth_ptr);
   earth_ptr->addChildren(earth_geo_ptr);
-  // init Scene Graph
-  scene_graph.setName("solar_system");
-  scene_graph.setRoot(root_ptr);
-}
 
-void ApplicationSolar::set_m_ViewTransform(glm::fmat4 const& camera_matrix) {
-  m_view_transform = camera_matrix;
+  // init moon TEST:
+  Node* moon_ptr = new Node("moon_holder", earth_ptr, "/moon", 3, earth_geo_ptr);
+  GeometryNode* moon_geo_ptr = new GeometryNode("moon", earth_ptr, "//root/earth/moon", 4, earth_geo_ptr);
+  moon_geo_ptr->setGeometry(planet_model);
+  moon_geo_ptr->setDistanceToOrigin(glm::fvec3{1.5f, 0.0f, 0.0f});
+  moon_geo_ptr->setSpeed(0.5f);
+  moon_geo_ptr->setRadius(0.272f);
+  // add moon to earth
+  earth_ptr->addChildren(moon_ptr);
+  moon_ptr->addChildren(moon_geo_ptr);
+
+  // init 4.mars
+  Node* mars_ptr = new Node("mars_holder", root_ptr, root_ptr->getPath() + "/mars", 1, sun_1_geo_ptr);
+  GeometryNode* mars_geo_ptr = new GeometryNode("mars", mars_ptr, "//root/mars", 2, sun_1_geo_ptr);
+  mars_geo_ptr->setGeometry(planet_model);
+  mars_geo_ptr->setDistanceToOrigin(glm::fvec3{30.0f, 0.0f, 0.0f});
+  mars_geo_ptr->setSpeed(0.2f);
+  mars_geo_ptr->setRadius(0.53f);
+  // add mars to root
+  root_ptr->addChildren(mars_ptr);
+  mars_ptr->addChildren(mars_geo_ptr);
+
+  // init 5.jupiter
+  Node* jupiter_ptr = new Node("jupiter_holder", root_ptr, root_ptr->getPath() + "/jupiter", 1, sun_1_geo_ptr);
+  GeometryNode* jupiter_geo_ptr = new GeometryNode("jupiter", jupiter_ptr, "//root/jupiter", 2, sun_1_geo_ptr);
+  jupiter_geo_ptr->setGeometry(planet_model);
+  jupiter_geo_ptr->setDistanceToOrigin(glm::fvec3{50.0f, 0.0f, 0.0f});
+  jupiter_geo_ptr->setSpeed(0.15f);
+  jupiter_geo_ptr->setRadius(3.98f);
+  // add jupiter to root
+  root_ptr->addChildren(jupiter_ptr);
+  jupiter_ptr->addChildren(jupiter_geo_ptr);
+
+  // init 6.saturn
+  Node* saturn_ptr = new Node("saturn_holder", root_ptr, root_ptr->getPath() + "/saturn", 1, sun_1_geo_ptr);
+  GeometryNode* saturn_geo_ptr = new GeometryNode("saturn", saturn_ptr, "//root/saturn", 2, sun_1_geo_ptr);
+  saturn_geo_ptr->setGeometry(planet_model);
+  saturn_geo_ptr->setDistanceToOrigin(glm::fvec3{91.0f, 0.0f, 0.0f});
+  saturn_geo_ptr->setSpeed(0.13f);
+  saturn_geo_ptr->setRadius(3.315f);
+  // add satur to root
+  root_ptr->addChildren(saturn_ptr);
+  saturn_ptr->addChildren(saturn_geo_ptr);
+
+  // init 7.uranus
+  Node* uranus_ptr = new Node("uranus_holder", root_ptr, root_ptr->getPath() + "/uranus", 1, sun_1_geo_ptr);
+  GeometryNode* uranus_geo_ptr = new GeometryNode("uranus", uranus_ptr, "//root/uranus", 2, sun_1_geo_ptr);
+  uranus_geo_ptr->setGeometry(planet_model);
+  uranus_geo_ptr->setDistanceToOrigin(glm::fvec3{182.0f, 0.0f, 0.0f});
+  uranus_geo_ptr->setSpeed(0.22f);
+  uranus_geo_ptr->setRadius(1.44f);
+  // add uranus to root
+  root_ptr->addChildren(uranus_ptr);
+  uranus_ptr->addChildren(uranus_geo_ptr);
+
+  // init 8.neptune
+  Node* neptune_ptr = new Node("neptune_holder", root_ptr, root_ptr->getPath() + "/neptune", 1, sun_1_geo_ptr);
+  GeometryNode* neptune_geo_ptr = new GeometryNode("neptune", neptune_ptr, "//root/neptune", 2, sun_1_geo_ptr);
+  neptune_geo_ptr->setGeometry(planet_model);
+  neptune_geo_ptr->setDistanceToOrigin(glm::fvec3{285.0f, 0.0f, 0.0f});
+  neptune_geo_ptr->setSpeed(0.3f);
+  neptune_geo_ptr->setRadius(1.4f);
+  // add neptune to root
+  root_ptr->addChildren(neptune_ptr);
+  neptune_ptr->addChildren(neptune_geo_ptr);
 }
 
 ///////////////////////////// callback functions for window events ////////////
