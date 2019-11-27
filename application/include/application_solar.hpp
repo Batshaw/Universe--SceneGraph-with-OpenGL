@@ -38,7 +38,7 @@ class ApplicationSolar : public Application {
   // upload view matrix
   void uploadView();
 
-  void initializeSceneGraph();
+  // void initializeSceneGraph();
 
   // help function to render method
   void render_planets(std::list<Node*> const& planets_list) const;
