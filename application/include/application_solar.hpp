@@ -29,6 +29,7 @@ class ApplicationSolar : public Application {
  protected:
   void initializeShaderPrograms();
   void initializeGeometry();
+  // init all planets
   void init_planets();
   // update uniform values
   void uploadUniforms();
@@ -39,14 +40,14 @@ class ApplicationSolar : public Application {
 
   void initializeSceneGraph();
 
-  // render methods
+  // help function to render method
   void render_planets(std::list<Node*> const& planets_list) const;
 
-  // compute transform matrix
+  // compute transform matrix (help function)
   glm::fmat4 compute_transform_matrix(Node* const& planet_ptr) const;
 
-
-  SceneGraph scene_graph;
+  // create the first and only instance for SceneGraph (Singleton Pattern)
+  SceneGraph* scene_graph = SceneGraph::getInstance();
 
   // cpu representation of model
   model_object planet_object;

@@ -1,18 +1,17 @@
 #include "scene_graph.hpp"
 
-//constructor for using without Singleton Pattern
-SceneGraph::SceneGraph(std::string const& name, Node* const& root) :
-    name_{name},
-    root_{root}     {}
+// set member (in-class) instance to null_pointer
+SceneGraph* SceneGraph::scenegraph_instance = nullptr;
 
 SceneGraph::SceneGraph() :
     name_{"Scene Graph"},
-    root_{}                 {}
+    root_{new Node()}                 {}
 
 SceneGraph::~SceneGraph() {
-  root_ = nullptr;
+   root_ = nullptr;
 }
 
+// Setter
 void SceneGraph::setName(std::string const& name) {
     name_ = name;
 }
@@ -20,6 +19,7 @@ void SceneGraph::setRoot(Node* const& root) {
     root_ = root;
 }
 
+// Getter
 std::string SceneGraph::getName() const{
     return name_;
 }

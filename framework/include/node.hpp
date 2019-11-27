@@ -12,7 +12,7 @@ class Node {
     
     public:
         // Constructors
-        Node();
+        Node();     // for root_
         Node(std::string const& name);
         Node(std::string const& name, Node* const& parent, std::string const& path, int depth, Node* const& origin);
 

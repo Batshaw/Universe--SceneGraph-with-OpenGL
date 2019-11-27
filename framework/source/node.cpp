@@ -11,7 +11,7 @@ Node::Node(std::string const& name) :
                 localTransform_(glm::fmat4{}),      
                 worldTransform_(glm::fmat4{}),
                 origin_(nullptr)    {}
-
+// default Node() for root_
 Node::Node() :  parent_(nullptr),
                 children_(),
                 name_("root"),

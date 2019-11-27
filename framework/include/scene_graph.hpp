@@ -10,22 +10,16 @@
 class SceneGraph {
 
     public:
-/*    
-        // static method for Singleton Pattern
-        static SceneGraph *getInstance() {
-            if(!scenegraph_instance)
-                scenegraph_instance = new SceneGraph;
+   
+        // static method for Singleton Pattern took from the Internet
+        static SceneGraph* getInstance() {
+            if(scenegraph_instance == nullptr)
+                scenegraph_instance = new SceneGraph();
             return scenegraph_instance;
         }
-*/
-        //normal constructor
-        SceneGraph();
-        SceneGraph(std::string const& name, Node* const& root);
-        ~SceneGraph();
 
         // Setter:
         void setName(std::string const& name);
-        void setRoot(Node* const& root);
 
         // Getter:
         std::string getName() const;
@@ -34,8 +28,16 @@ class SceneGraph {
         std::string printGraph();
 
     private:
+        // private constructors
+        SceneGraph();
+        ~SceneGraph();
+
+        // private Setter
+        void setRoot(Node* const& root);
+
         // private instance for SceneGraph --> no objects can be created
-        // static SceneGraph *scenegraph_instance;
+        static SceneGraph* scenegraph_instance;
+
         // member variables
         std::string name_;
         Node* root_;
