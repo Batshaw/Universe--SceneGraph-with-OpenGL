@@ -27,7 +27,20 @@ Node* SceneGraph::getRoot() const{
     return root_;
 }
 
-std::string SceneGraph::printGraph() {
-    // change later
-    return name_;
+void SceneGraph::printGraph() {
+	Node* root = getRoot();
+	int depth = root->getDepth();
+
+	printNode(root, depth);
+}
+
+void SceneGraph::printNode(Node* node, int depth) {
+	for (int i = 0; i < depth; ++i) {
+		std::cout << " ";
+	}
+
+	std::cout << node->getName() << std::endl;
+	for (Node* const& child : node->getChildrenList()) {
+		printNode(child, depth + 1);
+	}
 }

@@ -5,6 +5,7 @@
 #include "geometry_node.hpp"
 
 #include <string>
+#include <iostream>
 #include <node.hpp>
 
 class SceneGraph {
@@ -25,7 +26,8 @@ class SceneGraph {
         std::string getName() const;
         Node* getRoot() const;
 
-        std::string printGraph();
+        void printGraph();
+		void printNode(Node* node, int depth);
 
     private:
         // private constructors
