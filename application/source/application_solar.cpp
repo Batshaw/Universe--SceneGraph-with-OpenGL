@@ -327,6 +327,8 @@ void ApplicationSolar::init_planets() {
   // add neptune to root
   root_ptr->addChildren(neptune_ptr);
   neptune_ptr->addChildren(neptune_geo_ptr);
+
+  scene_graph->printGraph();
 }
 
 ///////////////////////////// callback functions for window events ////////////
