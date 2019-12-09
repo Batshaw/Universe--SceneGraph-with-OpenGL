@@ -31,6 +31,8 @@ class ApplicationSolar : public Application {
   void initializeGeometry();
   // init all planets
   void init_planets();
+  // init stars
+  void init_stars();
   // update uniform values
   void uploadUniforms();
   // upload projection matrix
@@ -42,15 +44,19 @@ class ApplicationSolar : public Application {
 
   // help function to render method
   void render_planets(std::list<Node*> const& planets_list) const;
+  void render_stars() const;
 
   // compute transform matrix (help function)
   glm::fmat4 compute_transform_matrix(Node* const& planet_ptr) const;
 
   // create the first and only instance for SceneGraph (Singleton Pattern)
   SceneGraph* scene_graph = SceneGraph::getInstance();
+  //star vector
+  std::vector<GLfloat> star_container;
 
   // cpu representation of model
   model_object planet_object;
+  model_object star_object;
   
   // camera transform matrix
   glm::fmat4 m_view_transform;
