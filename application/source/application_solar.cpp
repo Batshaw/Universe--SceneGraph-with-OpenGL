@@ -86,7 +86,6 @@ void ApplicationSolar::render_planets(std::list<Node*> const& scene_children_lis
     if(!children_of_planet.empty()) {
       render_planets(children_of_planet);   // recursive
     }
-    
     // ignore the holder and camera
     if(planet_ptr->getDepth() % 2 == 0 || planet_ptr->getName().find("cam") == std::string::npos) {
       //transform of the planet
@@ -128,11 +127,12 @@ glm::fmat4 ApplicationSolar::compute_transform_matrix(Node* const& planet_ptr) c
 }
 
 void ApplicationSolar::render_stars() const {
-  // bind shader to upload uniforms
-  glUseProgram(m_shaders.at("stars").handle);
   // bind the VAO to draw
   glBindVertexArray(star_object.vertex_AO);
+  // bind shader to upload uniforms
+  glUseProgram(m_shaders.at("stars").handle);
   // draw bound vertex array using bound shader
+  // (DRAW_MODE: prim_type, start_index, count: number of indices to be rendered)
   glDrawArrays(star_object.draw_mode, 0, star_object.num_elements);
 }
 
@@ -141,17 +141,18 @@ void ApplicationSolar::render_orbits(Node* const& child_planet) const {
   glm::fvec3 vec_to_scale = {radius, radius, radius};
   glm::fmat4 orbit_matrix = glm::fmat4{};
 
+  //rotation of the orbits of the moon, so it moves like the parent planet
   if(child_planet->getDepth() == 4) {
     glm::fmat4 parent_matrix = child_planet->getOrigin()->getLocalTransform();
     orbit_matrix = glm::rotate(parent_matrix, float(glfwGetTime()) * (child_planet->getOrigin()->getSpeed()), glm::fvec3{0.0f, 1.0f, 0.0f});
     orbit_matrix = glm::translate(orbit_matrix, -1.0f * child_planet->getOrigin()->getDistanceToOrigin());
   } 
-  
+  // scale the orbit with the radius
   orbit_matrix = glm::scale(orbit_matrix * child_planet->getLocalTransform(), vec_to_scale);
 
   // bind shader to upload uniform
   glUseProgram(m_shaders.at("orbits").handle);
-  // matrixes to shder
+  // matrixes to shader
   glUniformMatrix4fv(m_shaders.at("orbits").u_locs.at("OrbitMatrix"),
                       1, GL_FALSE, glm::value_ptr(orbit_matrix));
   // bind VAO to draw
@@ -410,42 +411,46 @@ void ApplicationSolar::init_planets() {
 
 // creating stars
 void ApplicationSolar::init_stars() {
-
   // 
   for(int i = 0; i <= 2500; ++i) {
-    // random XYZ-value for position of the star [0, 100]
-    GLfloat x = (rand() % 150) - 75.0f;
-    star_container.emplace_back(x);
+    // random XYZ-value for position of the star
+    GLfloat x = (rand() % 150) - 75.0f;     // random in INterval [-75; 75]
     GLfloat y = (rand() % 150) - 75.0f;
-    star_container.emplace_back(y);
     GLfloat z = (rand() % 150) - 75.0f;
+    star_container.emplace_back(y);
+    star_container.emplace_back(x);
     star_container.emplace_back(z); 
-    // random RGB-value for color of the star [0.1 to 1.0]
-    GLfloat r = ((rand() % 51) + 153)/ 255.0f;
+    // random RGB-value for color of the star
+    GLfloat r = ((rand() % 51) + 153)/ 255.0f;      // [51-204]
+    GLfloat g = ((rand() % 80) + 110) / 255.0f;     // [80-190]
+    GLfloat b = ((rand() % 64) + 140) / 255.0f;     // [64-204]
     star_container.emplace_back(r);
-    GLfloat g = ((rand() % 80) + 110) / 255.0f;
     star_container.emplace_back(g);
-    GLfloat b = ((rand() % 64) + 140) / 255.0f;
     star_container.emplace_back(b);
   }
   // generation of the vertex array object
-  glGenVertexArrays(1, &star_object.vertex_AO);
+  glGenVertexArrays(1, &star_object.vertex_AO);   // (number of VAO, array which VAOs are stored)
   // bind the array for attaching buffers
-  glBindVertexArray(star_object.vertex_AO);
+  glBindVertexArray(star_object.vertex_AO);       // (name of VA to bind)
   // generate generic buffer
-  glGenBuffers(1, &star_object.vertex_BO);
+  glGenBuffers(1, &star_object.vertex_BO);        // (number of VBO, array)
   // bind this as an vertex array buffer containing all attributes
-  glBindBuffer(GL_ARRAY_BUFFER, star_object.vertex_BO);
+  glBindBuffer(GL_ARRAY_BUFFER, star_object.vertex_BO);     // (target(purpose: Vertex attributes), buffer)
   // creates and initializes a buffer object's data store
   glBufferData(GL_ARRAY_BUFFER, GLsizeiptr(sizeof(float) * star_container.size()), star_container.data(), GL_STATIC_DRAW);
+  //Specify the attributes
   // atrribute 0 on GPU
   glEnableVertexAttribArray(0);
+  // (index of attribute, number of components, type, normalized, stride = components*num_attributes, pointer to first component of the first attribute)
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6, 0);
   // attribute 1 on GPU
   glEnableVertexAttribArray(1);
+  // (....,start of the 2nd attribute is at index 3, type of this is void pointer)
   glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6, (void*)(sizeof(float) * 3));
 
+  // define draw mode to use when render
   star_object.draw_mode = GL_POINTS;
+  // define number of elements: = size of the array devided by the number of componentsof attributes
   star_object.num_elements = GLsizei(star_container.size() / 6); 
 }
 
