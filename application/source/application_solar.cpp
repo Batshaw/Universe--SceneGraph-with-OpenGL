@@ -88,8 +88,9 @@ void ApplicationSolar::render_planets(std::list<Node*> const& scene_children_lis
     }
     // ignore the holder and camera
     if(planet_ptr->getDepth() % 2 == 0 || planet_ptr->getName().find("cam") == std::string::npos) {
-      //transform of the planet
+      // call render_orbits here so each planet will have its own orbit
       render_orbits(planet_ptr);
+      //transform of the planet      
       glm::fmat4 transform_matrix = compute_transform_matrix(planet_ptr);
       // extra matrix for normal transformation to keep them orthogonal to surface
       glm::fmat4 normal_matrix = glm::inverseTranspose(glm::inverse(m_view_transform) * transform_matrix);
@@ -195,7 +196,7 @@ void ApplicationSolar::uploadProjection() {
 
 // update uniform locations
 void ApplicationSolar::uploadUniforms() { 
-  // bind shader to which to upload unforms
+  // bind shader to which to upload uniforms
   glUseProgram(m_shaders.at("planet").handle);
   // upload uniform values to new locations
   uploadView();
@@ -411,8 +412,8 @@ void ApplicationSolar::init_planets() {
 
 // creating stars
 void ApplicationSolar::init_stars() {
-  // 
-  for(int i = 0; i <= 2500; ++i) {
+  // for loop to create 2500 stars
+  for(int i = 0; i < 2500; ++i) {
     // random XYZ-value for position of the star
     GLfloat x = (rand() % 150) - 75.0f;     // random in INterval [-75; 75]
     GLfloat y = (rand() % 150) - 75.0f;
@@ -455,18 +456,22 @@ void ApplicationSolar::init_stars() {
 }
 
 void ApplicationSolar::init_orbits() {
-  // 
+  // drawing circle with vertex
   for(int i = 0; i < 361; ++i) {
-    //current angle
-    float angle = float(i) * PI / 180.0f;
+    //current angle (first angle is 0)
+    float angle = float(i) * float(PI) / 180.0f;
     GLfloat x = cos(angle);
     GLfloat y = 0.0f;
     GLfloat z = sin(angle);
     // add index to container
-    orbit_container.emplace_back(x);
-    orbit_container.emplace_back(y);
-    orbit_container.emplace_back(z);
-
+    if(x == 0 && z == 0) {
+      continue;
+    }
+    else {
+      orbit_container.emplace_back(x);
+      orbit_container.emplace_back(y);
+      orbit_container.emplace_back(z);
+    }
   }
   // generate vertex array object
   glGenVertexArrays(1, &orbit_object.vertex_AO);

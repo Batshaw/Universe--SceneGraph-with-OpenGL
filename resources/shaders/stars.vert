@@ -1,8 +1,8 @@
 #version 150
 #extension GL_ARB_explicit_attrib_location : require
-// glVertexAttribPointer mapped positions to first
+// glVertexAttribPointer first attribute
 layout(location = 0) in vec3 in_Position;
-// glVertexAttribPointer mapped color  to second attribute 
+// glVertexAttribPointer to second attribute 
 layout(location = 1) in vec3 in_Color;
 
 //Matrix Uniforms uploaded with glUniform*
