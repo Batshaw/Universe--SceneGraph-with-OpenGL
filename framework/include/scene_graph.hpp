@@ -3,6 +3,7 @@
 
 #include "camera_node.hpp"
 #include "geometry_node.hpp"
+#include "PointLight_node.hpp"
 
 #include <string>
 #include <iostream>
@@ -28,6 +29,8 @@ class SceneGraph {
 
         void printGraph();
 		void printNode(Node* node, int depth);
+
+        // std::vector<PointLightNode*> light_source_container_;
 
     private:
         // private constructors

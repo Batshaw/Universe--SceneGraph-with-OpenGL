@@ -5,6 +5,7 @@
 #include "model.hpp"
 #include "structs.hpp"
 #include "scene_graph.hpp"
+#include "PointLight_node.hpp"
 
 // typedef std::shared_ptr<Node> node_ptr;
 

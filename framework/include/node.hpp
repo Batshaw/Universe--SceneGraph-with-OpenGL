@@ -25,6 +25,7 @@ class Node {
         void setDistanceToOrigin(glm::fvec3 const& distance_to_origin);
         void setSpeed(float const& speed);
         void setRadius(float const& radius);
+        void setColor(glm::fvec3 const& color);
 
 
         // Getter
@@ -40,6 +41,7 @@ class Node {
         Node* getOrigin() const;
         float getSpeed() const;
         float getRadius() const;
+        glm::fvec3 getColor() const;
 
         void addChildren(Node* const& children);
         Node* removeChildren(std::string const& children_name);
@@ -56,6 +58,7 @@ class Node {
         glm::fvec3 distance_to_origin_;
         float speed_;
         float radius_;
+        glm::fvec3 color_;
         
 };
 

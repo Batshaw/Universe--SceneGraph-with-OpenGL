@@ -50,6 +50,9 @@ void Node::setSpeed(float const& speed) {
 void Node::setRadius(float const& radius) {
     radius_ = radius;
 }
+void Node::setColor(glm::fvec3 const& color) {
+    color_ = color;
+}
 
 // Getter
 Node* Node::getParent() const {
@@ -91,6 +94,9 @@ float Node::getSpeed() const {
 }
 float Node::getRadius() const {
     return radius_;
+}
+glm::fvec3 Node::getColor() const {
+    return color_;
 }
 
 //lakjsdhaslkhdasd
