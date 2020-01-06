@@ -8,6 +8,7 @@
 #include <string>
 #include <iostream>
 #include <node.hpp>
+#include <memory>
 
 class SceneGraph {
 
@@ -29,8 +30,6 @@ class SceneGraph {
 
         void printGraph();
 		void printNode(Node* node, int depth);
-
-        // std::vector<PointLightNode*> light_source_container_;
 
     private:
         // private constructors

@@ -104,6 +104,10 @@ void ApplicationSolar::render_planets(std::list<Node*> const& scene_children_lis
       //glUniform3f
       glUniform3f(m_shaders.at("planet").u_locs.at("PlanetColor"),
                   planet_ptr->getColor().x, planet_ptr->getColor().y, planet_ptr->getColor().z);
+      // upload Uniform3f with lightIntensity and lightColor
+      glUniform1f(m_shaders.at("planet").u_locs.at("LightIntensity"), sun_1_light->gettLightIntensity());
+      glUniform3f(m_shaders.at("planet").u_locs.at("LightColor"),
+                  sun_1_light->getLightColor().x, sun_1_light->getLightColor().y, sun_1_light->getLightColor().z);
       // bind the VAO to draw
       glBindVertexArray(planet_object.vertex_AO);
       // draw bound vertex array using bound shader
@@ -219,6 +223,8 @@ void ApplicationSolar::initializeShaderPrograms() {
   m_shaders.at("planet").u_locs["ViewMatrix"] = -1;
   m_shaders.at("planet").u_locs["ProjectionMatrix"] = -1;
   m_shaders.at("planet").u_locs["PlanetColor"] = -1;
+  m_shaders.at("planet").u_locs["LightIntensity"] = -1;
+  m_shaders.at("planet").u_locs["LightColor"] = -1;
 
   m_shaders.emplace("stars", shader_program{{{GL_VERTEX_SHADER,m_resource_path + "shaders/stars.vert"},
                                            {GL_FRAGMENT_SHADER, m_resource_path + "shaders/stars.frag"}}});
@@ -283,21 +289,21 @@ void ApplicationSolar::init_planets() {
   root_ptr->addChildren(cam_1);
 */
   // init sun:
-  Node* sun_1_ptr = new Node("sun_holder", root_ptr, root_ptr->getPath() + "/sun", 1, nullptr);
-  GeometryNode* sun_1_geo_ptr = new GeometryNode("sun", root_ptr, "//root/sun_1", 2, nullptr);
+  // Node* sun_1_ptr = new Node("sun_holder", root_ptr, root_ptr->getPath() + "/sun", 1, nullptr);
+  // PointLightNode* sun_1_light = new PointLightNode(1.5f, {0.3f, 0.5f, 0.1f}, "sun1_light", root_ptr, "//root/sun_1_light", 1, nullptr);
+  GeometryNode* sun_1_geo_ptr = new GeometryNode("sun", sun_1_light, "//root/sun_1", 2, nullptr);
   sun_1_geo_ptr->setGeometry(planet_model);
   sun_1_geo_ptr->setDistanceToOrigin(glm::fvec3{0.0f, 0.0f, 0.0f});
   sun_1_geo_ptr->setSpeed(0.0f);
   sun_1_geo_ptr->setRadius(5.0f);
-  sun_1_geo_ptr->setColor(glm::fvec3{0.5f, 0.3f, 0.1f});
+  sun_1_geo_ptr->setColor(glm::fvec3{1.0f, 0.1f, 0.5f});
   // add sun to root
-  root_ptr->addChildren(sun_1_ptr);
-  sun_1_ptr->addChildren(sun_1_geo_ptr);
-
+  root_ptr->addChildren(sun_1_light);
+  sun_1_light->addChildren(sun_1_geo_ptr);
   // init PointLight
-  //PointLightNode* sun_1_light = new PointLightNode(1.5f, {0.3f, 0.5f, 0.1f}, "sun1_light", nullptr, "//root/sun_1_light", 1, nullptr);
-  //root_ptr->addChildren(sun_1_light);
-  // scene_graph->light_source_container_.emplace_back(sun_1_light);
+  // PointLightNode* sun_1_light = new PointLightNode(1.5f, {0.3f, 0.5f, 0.1f}, "sun1_light", nullptr, "//root/sun_1_light", 1, nullptr);
+  // root_ptr->addChildren(sun_1_light);
+
 
   // init 1.mercury
   Node* mecury_ptr = new Node("mecury_holder", root_ptr, root_ptr->getPath() + "/mecury", 1, sun_1_geo_ptr);
@@ -306,7 +312,7 @@ void ApplicationSolar::init_planets() {
   mecury_geo_ptr->setDistanceToOrigin(glm::fvec3{8.0f, 0.0f, 0.0f});
   mecury_geo_ptr->setSpeed(0.2f);
   mecury_geo_ptr->setRadius(0.385f);
-  mecury_geo_ptr->setColor(glm::fvec3{0.5, 0.3, 0.1});
+  mecury_geo_ptr->setColor(glm::fvec3{0.8f, 0.5f, 0.6f});
   // add mecury to root
   root_ptr->addChildren(mecury_ptr);
   mecury_ptr->addChildren(mecury_geo_ptr);

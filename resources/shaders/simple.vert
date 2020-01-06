@@ -10,10 +10,16 @@ uniform mat4 ViewMatrix;
 uniform mat4 ProjectionMatrix;
 uniform mat4 NormalMatrix;
 
+// pass the outputs to fragment
 out vec3 pass_Normal;
+out vec3 fragment_pos;
+out vec3 camera_pos;
+
 
 void main(void)
 {
 	gl_Position = (ProjectionMatrix  * ViewMatrix * ModelMatrix) * vec4(in_Position, 1.0);
-	pass_Normal = (NormalMatrix * vec4(in_Normal, 0.0)).xyz;
+	pass_Normal = (NormalMatrix * vec4(in_Normal, 0.0f)).xyz;
+	fragment_pos = (ModelMatrix * vec4(in_Position, 1.0f)).xyz;
+	camera_pos = (ViewMatrix * vec4(fragment_pos, 1.0f)).xyz;
 }
