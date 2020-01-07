@@ -29,6 +29,7 @@ ApplicationSolar::ApplicationSolar(std::string const& resource_path)
  ,orbit_container{}
  ,m_view_transform{glm::translate(glm::fmat4{}, glm::fvec3{0.0f, 0.0f, 75.0f})}
  ,m_view_projection{utils::calculate_projection_matrix(initial_aspect_ratio)}
+ ,CellShadingMode{false}  // default NORMAL MODE
 {
   initializeGeometry();
   init_planets();
@@ -106,6 +107,7 @@ void ApplicationSolar::render_planets(std::list<Node*> const& scene_children_lis
                   planet_ptr->getColor().x, planet_ptr->getColor().y, planet_ptr->getColor().z);
       // upload Uniform3f with lightIntensity and lightColor
       glUniform1f(m_shaders.at("planet").u_locs.at("LightIntensity"), sun_1_light->gettLightIntensity());
+      glUniform1i(m_shaders.at("planet").u_locs.at("CellShadingMode"), CellShadingMode);
       glUniform3f(m_shaders.at("planet").u_locs.at("LightColor"),
                   sun_1_light->getLightColor().x, sun_1_light->getLightColor().y, sun_1_light->getLightColor().z);
       // bind the VAO to draw
@@ -202,6 +204,11 @@ void ApplicationSolar::uploadProjection() {
                      1, GL_FALSE, glm::value_ptr(m_view_projection)); 
 }
 
+void ApplicationSolar::uploadMode() {
+  glUseProgram(m_shaders.at("planet").handle);
+  glUniform1i(m_shaders.at("planet").u_locs.at("CellShadingMode"), CellShadingMode);
+}
+
 // update uniform locations
 void ApplicationSolar::uploadUniforms() { 
   // bind shader to which to upload uniforms
@@ -209,6 +216,7 @@ void ApplicationSolar::uploadUniforms() {
   // upload uniform values to new locations
   uploadView();
   uploadProjection();
+  uploadMode();
 }
 
 ///////////////////////////// intialisation functions /////////////////////////
@@ -225,6 +233,7 @@ void ApplicationSolar::initializeShaderPrograms() {
   m_shaders.at("planet").u_locs["PlanetColor"] = -1;
   m_shaders.at("planet").u_locs["LightIntensity"] = -1;
   m_shaders.at("planet").u_locs["LightColor"] = -1;
+  m_shaders.at("planet").u_locs["CellShadingMode"] = -1;
 
   m_shaders.emplace("stars", shader_program{{{GL_VERTEX_SHADER,m_resource_path + "shaders/stars.vert"},
                                            {GL_FRAGMENT_SHADER, m_resource_path + "shaders/stars.frag"}}});
@@ -312,7 +321,7 @@ void ApplicationSolar::init_planets() {
   mecury_geo_ptr->setDistanceToOrigin(glm::fvec3{8.0f, 0.0f, 0.0f});
   mecury_geo_ptr->setSpeed(0.2f);
   mecury_geo_ptr->setRadius(0.385f);
-  mecury_geo_ptr->setColor(glm::fvec3{0.8f, 0.5f, 0.6f});
+  mecury_geo_ptr->setColor(glm::fvec3{0.59f, 0.59f, 0.62f});
   // add mecury to root
   root_ptr->addChildren(mecury_ptr);
   mecury_ptr->addChildren(mecury_geo_ptr);
@@ -324,7 +333,7 @@ void ApplicationSolar::init_planets() {
   venus_geo_ptr->setDistanceToOrigin(glm::fvec3{14.0f, 0.0f, 0.0f});
   venus_geo_ptr->setSpeed(0.15f);
   venus_geo_ptr->setRadius(0.95f);
-  venus_geo_ptr->setColor(glm::fvec3{0.5f, 0.3f, 0.1f});
+  venus_geo_ptr->setColor(glm::fvec3{1.0f, 1.0f, 0.75f});
   // add venus to root
   root_ptr->addChildren(venus_ptr);
   venus_ptr->addChildren(venus_geo_ptr);
@@ -336,7 +345,7 @@ void ApplicationSolar::init_planets() {
   earth_geo_ptr->setDistanceToOrigin(glm::fvec3{20.0f, 0.0f, 0.0f});
   earth_geo_ptr->setSpeed(0.1f);
   earth_geo_ptr->setRadius(1.0f);
-  earth_geo_ptr->setColor(glm::fvec3{0.5f, 0.3f, 0.1f});
+  earth_geo_ptr->setColor(glm::fvec3{0.0f, 0.52f, 0.85f});
   // add earth to root
   root_ptr->addChildren(earth_ptr);
   earth_ptr->addChildren(earth_geo_ptr);
@@ -348,7 +357,7 @@ void ApplicationSolar::init_planets() {
   moon_geo_ptr->setDistanceToOrigin(glm::fvec3{1.5f, 0.0f, 0.0f});
   moon_geo_ptr->setSpeed(0.5f);
   moon_geo_ptr->setRadius(0.272f);
-  moon_geo_ptr->setColor(glm::fvec3{0.5f, 0.3f, 0.1f});
+  moon_geo_ptr->setColor(glm::fvec3{0.83f, 0.83f, 0.83f});
   // add moon to earth
   earth_ptr->addChildren(moon_ptr);
   moon_ptr->addChildren(moon_geo_ptr);
@@ -360,7 +369,7 @@ void ApplicationSolar::init_planets() {
   mars_geo_ptr->setDistanceToOrigin(glm::fvec3{30.0f, 0.0f, 0.0f});
   mars_geo_ptr->setSpeed(0.2f);
   mars_geo_ptr->setRadius(0.53f);
-  mars_geo_ptr->setColor(glm::fvec3{0.5f, 0.3f, 0.1f});
+  mars_geo_ptr->setColor(glm::fvec3{0.63f, 0.24f, 0.18f});
   // add mars to root
   root_ptr->addChildren(mars_ptr);
   mars_ptr->addChildren(mars_geo_ptr);
@@ -371,7 +380,7 @@ void ApplicationSolar::init_planets() {
   phobos_geo_ptr->setDistanceToOrigin(glm::fvec3{1.5f, 0.0f, 0.0f});
   phobos_geo_ptr->setSpeed(1.2f);
   phobos_geo_ptr->setRadius(0.27f);
-  phobos_geo_ptr->setColor(glm::fvec3{0.5f, 0.3f, 0.1f});
+  phobos_geo_ptr->setColor(glm::fvec3{0.83f, 0.83f, 0.83f});
   // add phobos to mars
   mars_ptr->addChildren(phobos_ptr);
   phobos_ptr->addChildren(phobos_geo_ptr);
@@ -382,7 +391,7 @@ void ApplicationSolar::init_planets() {
   deimos_geo_ptr->setDistanceToOrigin(glm::fvec3{1.0f, 0.0f, 0.0f});
   deimos_geo_ptr->setSpeed(1.7f);
   deimos_geo_ptr->setRadius(0.19f);
-  deimos_geo_ptr->setColor(glm::fvec3{0.5f, 0.3f, 0.1f});
+  deimos_geo_ptr->setColor(glm::fvec3{0.83f, 0.83f, 0.83f});
   // add deimos to mars
   mars_ptr->addChildren(deimos_ptr);
   deimos_ptr->addChildren(deimos_geo_ptr);
@@ -394,7 +403,7 @@ void ApplicationSolar::init_planets() {
   jupiter_geo_ptr->setDistanceToOrigin(glm::fvec3{40.0f, 0.0f, 0.0f});
   jupiter_geo_ptr->setSpeed(0.15f);
   jupiter_geo_ptr->setRadius(1.98f);
-  jupiter_geo_ptr->setColor(glm::fvec3{0.5f, 0.3f, 0.1f});
+  jupiter_geo_ptr->setColor(glm::fvec3{1.0f, 0.55f, 0.24f});
   // add jupiter to root
   root_ptr->addChildren(jupiter_ptr);
   jupiter_ptr->addChildren(jupiter_geo_ptr);
@@ -406,7 +415,7 @@ void ApplicationSolar::init_planets() {
   saturn_geo_ptr->setDistanceToOrigin(glm::fvec3{50.0f, 0.0f, 0.0f});
   saturn_geo_ptr->setSpeed(0.13f);
   saturn_geo_ptr->setRadius(1.315f);
-  saturn_geo_ptr->setColor(glm::fvec3{0.5f, 0.3f, 0.1f});
+  saturn_geo_ptr->setColor(glm::fvec3{0.9f, 0.75f, 0.54f});
   // add satur to root
   root_ptr->addChildren(saturn_ptr);
   saturn_ptr->addChildren(saturn_geo_ptr);
@@ -418,7 +427,7 @@ void ApplicationSolar::init_planets() {
   uranus_geo_ptr->setDistanceToOrigin(glm::fvec3{60.0f, 0.0f, 0.0f});
   uranus_geo_ptr->setSpeed(0.22f);
   uranus_geo_ptr->setRadius(0.94f);
-  uranus_geo_ptr->setColor(glm::fvec3{0.5f, 0.3f, 0.1f});
+  uranus_geo_ptr->setColor(glm::fvec3{0.69f, 0.93f, 0.93f});
   // add uranus to root
   root_ptr->addChildren(uranus_ptr);
   uranus_ptr->addChildren(uranus_geo_ptr);
@@ -430,7 +439,7 @@ void ApplicationSolar::init_planets() {
   neptune_geo_ptr->setDistanceToOrigin(glm::fvec3{85.0f, 0.0f, 0.0f});
   neptune_geo_ptr->setSpeed(0.3f);
   neptune_geo_ptr->setRadius(1.4f);
-  neptune_geo_ptr->setColor(glm::fvec3{0.5f, 0.3f, 0.1f});
+  neptune_geo_ptr->setColor(glm::fvec3{0.69f, 0.93f, 0.93f});
   // add neptune to root
   root_ptr->addChildren(neptune_ptr);
   neptune_ptr->addChildren(neptune_geo_ptr);
@@ -561,6 +570,18 @@ void ApplicationSolar::keyCallback(int key, int action, int mods) {
     m_view_transform = glm::translate(m_view_transform, glm::fvec3{0.0f, 0.5f, 0.0f});
     uploadView();
   }   
+  else if (key == GLFW_KEY_1 && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
+    if(CellShadingMode == true) {
+      CellShadingMode = false;
+      uploadMode();
+    }
+  }
+  else if (key == GLFW_KEY_2 && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
+    if(CellShadingMode == false) {
+      CellShadingMode = true;
+      uploadMode();
+    }
+  }
 
 }
 
