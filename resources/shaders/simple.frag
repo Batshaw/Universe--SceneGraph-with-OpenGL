@@ -47,17 +47,19 @@ void main() {
   float specular_light = pow(max(dot(h, normal_vector), 0), shine) * LightIntensity;
   vec3 specular = specular_intensity * LightColor * specular_light;               // specular color is white = light color
 
-  float ambient = ambient_intensity * ambient_intensity;
+  vec3 ambient = ambient_intensity * ambient_color;
   
-  if(!CellShadingMode){
+  if(!CellShadingMode) {
     out_Color = vec4((ambient + diffuse) * PlanetColor + specular, 1.0f);
   }
   else {
     vec3 CellColor = floor(PlanetColor * 3);   // 3 levels of brightness
     CellColor = CellColor / 3;
-    if(max(dot(normal_vector, incoming_ray), 0.0f) < 0.35) {
-      outline = 0;
+    /*
+    if(max(dot(normal_vector, incoming_ray), 0.0f) < 0.05f) {    // outline the vertex if the normal vector and the vector from vertex to camera is almost perpendicular
+      outline = 0.0f;
     }
-    out_Color = vec4((ambient + diffuse) * CellColor + specular, 1.0f);
+    */
+    out_Color = vec4((ambient + diffuse) * CellColor + specular, 1.0f) * outline;
   }
 }
