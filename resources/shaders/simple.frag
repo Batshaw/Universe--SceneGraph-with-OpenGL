@@ -50,7 +50,7 @@ void main() {
   float LightInten = 0.0f;
   float dot_value = dot(normal_vector, incoming_ray);
   if (dot_value < 0){
-    LightInten = LightIntensity / 8.0f;
+    LightInten = LightIntensity / 7.0f;
   }
   else LightInten = LightIntensity;
   float diffuse_light = abs(dot(normal_vector, incoming_ray)) * LightInten;
