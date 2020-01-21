@@ -6,6 +6,7 @@
 #include "structs.hpp"
 #include "scene_graph.hpp"
 #include "PointLight_node.hpp"
+#include "texture_loader.hpp"
 
 // typedef std::shared_ptr<Node> node_ptr;
 
@@ -36,6 +37,8 @@ class ApplicationSolar : public Application {
   void init_stars();
   // init orbits
   void init_orbits();
+  // init Texture for planets
+  void init_textures();
   // update uniform values
   void uploadUniforms();
   // upload projection matrix
@@ -54,6 +57,9 @@ class ApplicationSolar : public Application {
 
   // compute transform matrix (help function)
   glm::fmat4 compute_transform_matrix(Node* const& planet_ptr) const;
+
+  // Texture loader
+  void planet_texture_loader(std::list<Node*> const& planets_list);
 
   // create the first and only instance for SceneGraph (Singleton Pattern)
   SceneGraph* scene_graph = SceneGraph::getInstance();
