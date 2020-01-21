@@ -46,7 +46,15 @@ void main() {
 
   // Blinn-Phong: (ambient + diffuse) * PlanetColor + specular(Blinn)
 
-  float diffuse_light = max(dot(normal_vector, incoming_ray), 0) * LightIntensity;
+  // float diffuse_light = max(dot(normal_vector, incoming_ray), 0) * LightIntensity;
+  float LightInten = 0.0f;
+  float dot_value = dot(normal_vector, incoming_ray);
+  if (dot_value < 0){
+    LightInten = LightIntensity / 8.0f;
+  }
+  else LightInten = LightIntensity;
+  float diffuse_light = abs(dot(normal_vector, incoming_ray)) * LightInten;
+
   vec3 diffuse = diffuse_intensity * diffuse_light * texture_color.rgb; /*ambient_color;*/               //diffuse color = ambient color, now use texture color as diffuse color
 
   float specular_light = pow(max(dot(h, normal_vector), 0), shine) * LightIntensity;
