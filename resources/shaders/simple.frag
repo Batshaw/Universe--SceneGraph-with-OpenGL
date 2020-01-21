@@ -4,6 +4,7 @@
 in  vec3 pass_Normal;
 in vec3 fragment_pos;
 in vec3 camera_pos;
+in vec2 texture_coord;
 
 // output color
 out vec4 out_Color;
@@ -12,6 +13,10 @@ uniform vec3 PlanetColor;
 uniform float LightIntensity;
 uniform vec3 LightColor;
 uniform bool CellShadingMode;
+uniform sampler2D PlanetTexture;
+
+// color from texture
+vec4 texture_color = texture(PlanetTexture, texture_coord);
 
 // Shades of light
 vec3 ambient_color = vec3(1.0f, 0.97f, 0.91f);    // Cosmic latte
@@ -42,7 +47,7 @@ void main() {
   // Blinn-Phong: (ambient + diffuse) * PlanetColor + specular(Blinn)
 
   float diffuse_light = max(dot(normal_vector, incoming_ray), 0) * LightIntensity;
-  vec3 diffuse = diffuse_intensity * diffuse_light * ambient_color;               //diffuse color = ambient color
+  vec3 diffuse = diffuse_intensity * diffuse_light * texture_color.rgb; /*ambient_color;*/               //diffuse color = ambient color, now use texture color as diffuse color
 
   float specular_light = pow(max(dot(h, normal_vector), 0), shine) * LightIntensity;
   vec3 specular = specular_intensity * LightColor * specular_light;               // specular color is white = light color

@@ -35,6 +35,7 @@ ApplicationSolar::ApplicationSolar(std::string const& resource_path)
   init_planets();
   init_stars();
   init_orbits();
+  init_textures();
   initializeShaderPrograms();
 }
 
@@ -110,6 +111,11 @@ void ApplicationSolar::render_planets(std::list<Node*> const& scene_children_lis
       glUniform1i(m_shaders.at("planet").u_locs.at("CellShadingMode"), CellShadingMode);
       glUniform3f(m_shaders.at("planet").u_locs.at("LightColor"),
                   sun_1_light->getLightColor().x, sun_1_light->getLightColor().y, sun_1_light->getLightColor().z);
+
+      // upload textures to shader
+      glActiveTexture(GL_TEXTURE0);   // active texture
+      glBindTexture(GL_TEXTURE_2D, planet_ptr->getTextureObject().handle);  // bind texture to shader for accessing
+      glUniform1i(glGetUniformLocation(m_shaders.at("planet").handle, "PlanetTexture"), 0);    // 0 is texture slot in active
       // bind the VAO to draw
       glBindVertexArray(planet_object.vertex_AO);
       // draw bound vertex array using bound shader
@@ -234,6 +240,8 @@ void ApplicationSolar::initializeShaderPrograms() {
   m_shaders.at("planet").u_locs["LightIntensity"] = -1;
   m_shaders.at("planet").u_locs["LightColor"] = -1;
   m_shaders.at("planet").u_locs["CellShadingMode"] = -1;
+  m_shaders.at("planet").u_locs["PlanetTexture"] = -1;
+
 
   m_shaders.emplace("stars", shader_program{{{GL_VERTEX_SHADER,m_resource_path + "shaders/stars.vert"},
                                            {GL_FRAGMENT_SHADER, m_resource_path + "shaders/stars.frag"}}});
@@ -249,7 +257,7 @@ void ApplicationSolar::initializeShaderPrograms() {
 
 // load models
 void ApplicationSolar::initializeGeometry() {
-  model planet_model = model_loader::obj(m_resource_path + "models/sphere.obj", model::NORMAL);
+  model planet_model = model_loader::obj(m_resource_path + "models/sphere.obj", model::NORMAL | model::TEXCOORD);
 
   // generate vertex array object
   glGenVertexArrays(1, &planet_object.vertex_AO);
@@ -271,6 +279,11 @@ void ApplicationSolar::initializeGeometry() {
   glEnableVertexAttribArray(1);
   // second attribute is 3 floats with no offset & stride
   glVertexAttribPointer(1, model::NORMAL.components, model::NORMAL.type, GL_FALSE, planet_model.vertex_bytes, planet_model.offsets[model::NORMAL]);
+  // activate third attribute on gpu
+  glEnableVertexAttribArray(2);
+  // second attribute is 2 floats with no offset & stride
+  glVertexAttribPointer(2, model::TEXCOORD.components, model::TEXCOORD.type, GL_FALSE, planet_model.vertex_bytes, planet_model.offsets[model::TEXCOORD]);
+
 
    // generate generic buffer
   glGenBuffers(1, &planet_object.element_BO);
@@ -306,6 +319,7 @@ void ApplicationSolar::init_planets() {
   sun_1_geo_ptr->setSpeed(0.0f);
   sun_1_geo_ptr->setRadius(5.0f);
   sun_1_geo_ptr->setColor(glm::fvec3{1.0f, 0.1f, 0.5f});
+  sun_1_geo_ptr->setTexturePath(m_resource_path + "textures/sunmap.png");
   // add sun to root
   root_ptr->addChildren(sun_1_light);
   sun_1_light->addChildren(sun_1_geo_ptr);
@@ -322,6 +336,7 @@ void ApplicationSolar::init_planets() {
   mecury_geo_ptr->setSpeed(0.2f);
   mecury_geo_ptr->setRadius(0.385f);
   mecury_geo_ptr->setColor(glm::fvec3{0.59f, 0.59f, 0.62f});
+  mecury_geo_ptr->setTexturePath(m_resource_path + "textures/mercurymap.png");
   // add mecury to root
   root_ptr->addChildren(mecury_ptr);
   mecury_ptr->addChildren(mecury_geo_ptr);
@@ -334,6 +349,7 @@ void ApplicationSolar::init_planets() {
   venus_geo_ptr->setSpeed(0.15f);
   venus_geo_ptr->setRadius(0.95f);
   venus_geo_ptr->setColor(glm::fvec3{1.0f, 1.0f, 0.75f});
+  venus_geo_ptr->setTexturePath(m_resource_path + "textures/venusmap.png");
   // add venus to root
   root_ptr->addChildren(venus_ptr);
   venus_ptr->addChildren(venus_geo_ptr);
@@ -346,6 +362,7 @@ void ApplicationSolar::init_planets() {
   earth_geo_ptr->setSpeed(0.1f);
   earth_geo_ptr->setRadius(1.0f);
   earth_geo_ptr->setColor(glm::fvec3{0.0f, 0.52f, 0.85f});
+  earth_geo_ptr->setTexturePath(m_resource_path + "textures/earthmap1k.png");
   // add earth to root
   root_ptr->addChildren(earth_ptr);
   earth_ptr->addChildren(earth_geo_ptr);
@@ -358,6 +375,7 @@ void ApplicationSolar::init_planets() {
   moon_geo_ptr->setSpeed(0.5f);
   moon_geo_ptr->setRadius(0.272f);
   moon_geo_ptr->setColor(glm::fvec3{0.83f, 0.83f, 0.83f});
+  moon_geo_ptr->setTexturePath(m_resource_path + "textures/moonmap1k.png");
   // add moon to earth
   earth_ptr->addChildren(moon_ptr);
   moon_ptr->addChildren(moon_geo_ptr);
@@ -370,28 +388,31 @@ void ApplicationSolar::init_planets() {
   mars_geo_ptr->setSpeed(0.2f);
   mars_geo_ptr->setRadius(0.53f);
   mars_geo_ptr->setColor(glm::fvec3{0.63f, 0.24f, 0.18f});
+  mars_geo_ptr->setTexturePath(m_resource_path + "textures/mars_1k_color.png");
   // add mars to root
   root_ptr->addChildren(mars_ptr);
   mars_ptr->addChildren(mars_geo_ptr);
   // init moon of mars: phobos
   Node* phobos_ptr = new Node("phobos_holder", mars_ptr, "/phobos", 3, mars_geo_ptr);
-  GeometryNode* phobos_geo_ptr = new GeometryNode("phobos", mars_ptr, "//root/earth/phobos", 4, mars_geo_ptr);
+  GeometryNode* phobos_geo_ptr = new GeometryNode("phobos", mars_ptr, "//root/mars/phobos", 4, mars_geo_ptr);
   phobos_geo_ptr->setGeometry(planet_model);
   phobos_geo_ptr->setDistanceToOrigin(glm::fvec3{1.5f, 0.0f, 0.0f});
   phobos_geo_ptr->setSpeed(1.2f);
   phobos_geo_ptr->setRadius(0.27f);
   phobos_geo_ptr->setColor(glm::fvec3{0.83f, 0.83f, 0.83f});
+  phobos_geo_ptr->setTexturePath(m_resource_path + "textures/phobosbump.png");
   // add phobos to mars
   mars_ptr->addChildren(phobos_ptr);
   phobos_ptr->addChildren(phobos_geo_ptr);
   // init moon of mars: deimos
   Node* deimos_ptr = new Node("deimos_holder", mars_ptr, "/deimos", 3, mars_geo_ptr);
-  GeometryNode* deimos_geo_ptr = new GeometryNode("deimos", mars_ptr, "//root/earth/deimos", 4, mars_geo_ptr);
+  GeometryNode* deimos_geo_ptr = new GeometryNode("deimos", mars_ptr, "//root/mars/deimos", 4, mars_geo_ptr);
   deimos_geo_ptr->setGeometry(planet_model);
   deimos_geo_ptr->setDistanceToOrigin(glm::fvec3{1.0f, 0.0f, 0.0f});
   deimos_geo_ptr->setSpeed(1.7f);
   deimos_geo_ptr->setRadius(0.19f);
   deimos_geo_ptr->setColor(glm::fvec3{0.83f, 0.83f, 0.83f});
+  deimos_geo_ptr->setTexturePath(m_resource_path + "textures/deimosbump.png");
   // add deimos to mars
   mars_ptr->addChildren(deimos_ptr);
   deimos_ptr->addChildren(deimos_geo_ptr);
@@ -404,6 +425,7 @@ void ApplicationSolar::init_planets() {
   jupiter_geo_ptr->setSpeed(0.15f);
   jupiter_geo_ptr->setRadius(1.98f);
   jupiter_geo_ptr->setColor(glm::fvec3{1.0f, 0.55f, 0.24f});
+  jupiter_geo_ptr->setTexturePath(m_resource_path + "textures/jupitermap.png");
   // add jupiter to root
   root_ptr->addChildren(jupiter_ptr);
   jupiter_ptr->addChildren(jupiter_geo_ptr);
@@ -416,6 +438,7 @@ void ApplicationSolar::init_planets() {
   saturn_geo_ptr->setSpeed(0.13f);
   saturn_geo_ptr->setRadius(1.315f);
   saturn_geo_ptr->setColor(glm::fvec3{0.9f, 0.75f, 0.54f});
+  saturn_geo_ptr->setTexturePath(m_resource_path + "textures/saturnmap.png");
   // add satur to root
   root_ptr->addChildren(saturn_ptr);
   saturn_ptr->addChildren(saturn_geo_ptr);
@@ -428,6 +451,7 @@ void ApplicationSolar::init_planets() {
   uranus_geo_ptr->setSpeed(0.22f);
   uranus_geo_ptr->setRadius(0.94f);
   uranus_geo_ptr->setColor(glm::fvec3{0.69f, 0.93f, 0.93f});
+  uranus_geo_ptr->setTexturePath(m_resource_path + "textures/uranusmap.png");
   // add uranus to root
   root_ptr->addChildren(uranus_ptr);
   uranus_ptr->addChildren(uranus_geo_ptr);
@@ -440,6 +464,7 @@ void ApplicationSolar::init_planets() {
   neptune_geo_ptr->setSpeed(0.3f);
   neptune_geo_ptr->setRadius(1.4f);
   neptune_geo_ptr->setColor(glm::fvec3{0.69f, 0.93f, 0.93f});
+  neptune_geo_ptr->setTexturePath(m_resource_path + "textures/neptunemap.png");
   // add neptune to root
   root_ptr->addChildren(neptune_ptr);
   neptune_ptr->addChildren(neptune_geo_ptr);
@@ -531,6 +556,38 @@ void ApplicationSolar::init_orbits() {
   orbit_object.draw_mode = GL_LINE_LOOP;
   // number of indexs to model object
   orbit_object.num_elements = GLsizei(orbit_container.size() / 3);
+}
+
+void ApplicationSolar::init_textures() {
+  // planet textures
+  auto planets_list = scene_graph->getRoot()->getChildrenList();
+  planet_texture_loader(planets_list);
+}
+void ApplicationSolar::planet_texture_loader(std::list<Node*> const& planets_list) {
+  for (auto const& planet_ptr : planets_list) {
+    auto children_list = planet_ptr->getChildrenList();
+
+    if (children_list.size() > 0) {
+      planet_texture_loader(children_list);
+    }
+
+    if (planet_ptr->getDepth() % 2 == 0) {
+      auto texture = planet_ptr->getTexture();
+      auto texture_object = planet_ptr->getTextureObject();
+
+      glActiveTexture(GL_TEXTURE0);
+      glGenTextures(1, &texture_object.handle);
+      glBindTexture(GL_TEXTURE_2D, texture_object.handle);
+
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+      glTexImage2D(GL_TEXTURE_2D, 0, texture.channels, texture.width, texture.height,
+                                  0, texture.channels, texture.channel_type, texture.ptr());
+
+      planet_ptr->setTextureObject(texture_object);
+    }
+  }
 }
 
 ///////////////////////////// callback functions for window events ////////////

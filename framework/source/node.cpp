@@ -108,3 +108,24 @@ Node* Node::removeChildren(std::string const& children_name) {
     children_.remove(removed_child);
     return removed_child;
 }
+
+// virtual function (empty and ready to be overrided)
+void Node::setTexturePath(std::string const& texture_path) {
+
+}
+void Node::setTextureObject(texture_object const& texture_object) {
+
+}
+void Node::setTexture() {
+
+}
+
+std::string Node::getTexturePath() const {
+    return std::string{};
+}
+texture_object Node::getTextureObject() const {
+    return texture_object{};
+}
+pixel_data Node::getTexture() const {
+    return pixel_data{};
+}

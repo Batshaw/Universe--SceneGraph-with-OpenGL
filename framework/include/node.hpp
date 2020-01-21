@@ -5,6 +5,8 @@
 #include <memory>       // for shared_ptr
 #include <list>
 #include <glm/glm.hpp>
+#include <structs.hpp>
+#include <pixel_data.hpp>
 
 // typedef std::shared_ptr<Node> node_ptr;
 
@@ -45,6 +47,15 @@ class Node {
 
         void addChildren(Node* const& children);
         Node* removeChildren(std::string const& children_name);
+
+        // virtual function for geometry node to override
+        virtual void setTexturePath(std::string const& texture_path);
+        virtual void setTextureObject(texture_object const& texture_object);
+        virtual void setTexture();
+
+        virtual std::string getTexturePath() const;
+        virtual texture_object getTextureObject() const;
+        virtual pixel_data getTexture() const;
 
     private:
         Node* parent_;
