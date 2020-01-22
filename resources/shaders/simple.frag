@@ -15,7 +15,7 @@ uniform vec3 LightColor;
 uniform bool CellShadingMode;
 uniform sampler2D PlanetTexture;
 
-// color from texture
+// sampling the color from texture
 vec4 texture_color = texture(PlanetTexture, texture_coord);
 
 // Shades of light

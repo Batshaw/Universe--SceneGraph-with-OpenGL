@@ -557,7 +557,7 @@ void ApplicationSolar::init_orbits() {
   // number of indexs to model object
   orbit_object.num_elements = GLsizei(orbit_container.size() / 3);
 }
-
+// set Texture for each Planet Object
 void ApplicationSolar::init_textures() {
   // planet textures
   auto planets_list = scene_graph->getRoot()->getChildrenList();
@@ -575,11 +575,12 @@ void ApplicationSolar::planet_texture_loader(std::list<Node*> const& planets_lis
       auto texture = planet_ptr->getTexture();
       auto texture_object = planet_ptr->getTextureObject();
 
-      glActiveTexture(GL_TEXTURE0);
+      glActiveTexture(GL_TEXTURE0);             // the first and the only Texture to be actived
       glGenTextures(1, &texture_object.handle);
-      glBindTexture(GL_TEXTURE_2D, texture_object.handle);
-
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+      glBindTexture(GL_TEXTURE_2D, texture_object.handle);        // target: texture is bound to 2D
+      
+      // Define Texture Sampling Parameters
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);   // LINEAR: weighted average of the four neighbouring texels
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
       glTexImage2D(GL_TEXTURE_2D, 0, texture.channels, texture.width, texture.height,
