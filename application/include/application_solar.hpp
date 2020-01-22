@@ -63,7 +63,7 @@ class ApplicationSolar : public Application {
 
   // create the first and only instance for SceneGraph (Singleton Pattern)
   SceneGraph* scene_graph = SceneGraph::getInstance();
-  PointLightNode* sun_1_light = new PointLightNode(3.5f, {0.98f, 0.96f, 0.95f}, "sun1_light", nullptr, "//root/sun_1_light", 1, nullptr);
+  PointLightNode* sun_1_light = new PointLightNode(2.0f, {0.98f, 0.96f, 0.95f}, "sun1_light", nullptr, "//root/sun_1_light", 1, nullptr);
   //star vector
   std::vector<GLfloat> star_container;
   std::vector<GLfloat> orbit_container;

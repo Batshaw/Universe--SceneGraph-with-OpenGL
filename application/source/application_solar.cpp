@@ -318,7 +318,7 @@ void ApplicationSolar::init_planets() {
   sun_1_geo_ptr->setDistanceToOrigin(glm::fvec3{0.0f, 0.0f, 0.0f});
   sun_1_geo_ptr->setSpeed(0.0f);
   sun_1_geo_ptr->setRadius(5.0f);
-  sun_1_geo_ptr->setColor(glm::fvec3{1.0f, 0.1f, 0.5f});
+  sun_1_geo_ptr->setColor(glm::fvec3{1.0f, 1.0f, 0.7f});
   sun_1_geo_ptr->setTexturePath(m_resource_path + "textures/sunmap.png");
   // add sun to root
   root_ptr->addChildren(sun_1_light);
@@ -335,7 +335,7 @@ void ApplicationSolar::init_planets() {
   mecury_geo_ptr->setDistanceToOrigin(glm::fvec3{8.0f, 0.0f, 0.0f});
   mecury_geo_ptr->setSpeed(0.2f);
   mecury_geo_ptr->setRadius(0.385f);
-  mecury_geo_ptr->setColor(glm::fvec3{0.59f, 0.59f, 0.62f});
+  mecury_geo_ptr->setColor(glm::fvec3{0.42f, 0.26f, 0.1f});
   mecury_geo_ptr->setTexturePath(m_resource_path + "textures/mercurymap.png");
   // add mecury to root
   root_ptr->addChildren(mecury_ptr);
@@ -348,7 +348,7 @@ void ApplicationSolar::init_planets() {
   venus_geo_ptr->setDistanceToOrigin(glm::fvec3{14.0f, 0.0f, 0.0f});
   venus_geo_ptr->setSpeed(0.15f);
   venus_geo_ptr->setRadius(0.95f);
-  venus_geo_ptr->setColor(glm::fvec3{1.0f, 1.0f, 0.75f});
+  venus_geo_ptr->setColor(glm::fvec3{0.6f, 0.4f, 0.2f});
   venus_geo_ptr->setTexturePath(m_resource_path + "textures/venusmap.png");
   // add venus to root
   root_ptr->addChildren(venus_ptr);
@@ -361,7 +361,7 @@ void ApplicationSolar::init_planets() {
   earth_geo_ptr->setDistanceToOrigin(glm::fvec3{20.0f, 0.0f, 0.0f});
   earth_geo_ptr->setSpeed(0.1f);
   earth_geo_ptr->setRadius(1.0f);
-  earth_geo_ptr->setColor(glm::fvec3{0.0f, 0.52f, 0.85f});
+  earth_geo_ptr->setColor(glm::fvec3{0.2f, 0.6f, 1.0f});
   earth_geo_ptr->setTexturePath(m_resource_path + "textures/earthmap1k.png");
   // add earth to root
   root_ptr->addChildren(earth_ptr);
@@ -374,7 +374,7 @@ void ApplicationSolar::init_planets() {
   moon_geo_ptr->setDistanceToOrigin(glm::fvec3{1.5f, 0.0f, 0.0f});
   moon_geo_ptr->setSpeed(0.5f);
   moon_geo_ptr->setRadius(0.272f);
-  moon_geo_ptr->setColor(glm::fvec3{0.83f, 0.83f, 0.83f});
+  moon_geo_ptr->setColor(glm::fvec3{0.5f, 0.5f, 0.5f});
   moon_geo_ptr->setTexturePath(m_resource_path + "textures/moonmap1k.png");
   // add moon to earth
   earth_ptr->addChildren(moon_ptr);
@@ -387,7 +387,7 @@ void ApplicationSolar::init_planets() {
   mars_geo_ptr->setDistanceToOrigin(glm::fvec3{30.0f, 0.0f, 0.0f});
   mars_geo_ptr->setSpeed(0.2f);
   mars_geo_ptr->setRadius(0.53f);
-  mars_geo_ptr->setColor(glm::fvec3{0.63f, 0.24f, 0.18f});
+  mars_geo_ptr->setColor(glm::fvec3{0.55f, 0.35f, 0.3f});
   mars_geo_ptr->setTexturePath(m_resource_path + "textures/mars_1k_color.png");
   // add mars to root
   root_ptr->addChildren(mars_ptr);
@@ -399,7 +399,7 @@ void ApplicationSolar::init_planets() {
   phobos_geo_ptr->setDistanceToOrigin(glm::fvec3{1.5f, 0.0f, 0.0f});
   phobos_geo_ptr->setSpeed(1.2f);
   phobos_geo_ptr->setRadius(0.27f);
-  phobos_geo_ptr->setColor(glm::fvec3{0.83f, 0.83f, 0.83f});
+  phobos_geo_ptr->setColor(glm::fvec3{0.4f, 0.4f, 0.4f});
   phobos_geo_ptr->setTexturePath(m_resource_path + "textures/phobosbump.png");
   // add phobos to mars
   mars_ptr->addChildren(phobos_ptr);
@@ -411,7 +411,7 @@ void ApplicationSolar::init_planets() {
   deimos_geo_ptr->setDistanceToOrigin(glm::fvec3{1.0f, 0.0f, 0.0f});
   deimos_geo_ptr->setSpeed(1.7f);
   deimos_geo_ptr->setRadius(0.19f);
-  deimos_geo_ptr->setColor(glm::fvec3{0.83f, 0.83f, 0.83f});
+  deimos_geo_ptr->setColor(glm::fvec3{0.3f, 0.3f, 0.3f});
   deimos_geo_ptr->setTexturePath(m_resource_path + "textures/deimosbump.png");
   // add deimos to mars
   mars_ptr->addChildren(deimos_ptr);
@@ -424,7 +424,7 @@ void ApplicationSolar::init_planets() {
   jupiter_geo_ptr->setDistanceToOrigin(glm::fvec3{40.0f, 0.0f, 0.0f});
   jupiter_geo_ptr->setSpeed(0.15f);
   jupiter_geo_ptr->setRadius(1.98f);
-  jupiter_geo_ptr->setColor(glm::fvec3{1.0f, 0.55f, 0.24f});
+  jupiter_geo_ptr->setColor(glm::fvec3{1.0f, 0.75f, 0.6f});
   jupiter_geo_ptr->setTexturePath(m_resource_path + "textures/jupitermap.png");
   // add jupiter to root
   root_ptr->addChildren(jupiter_ptr);
@@ -437,7 +437,7 @@ void ApplicationSolar::init_planets() {
   saturn_geo_ptr->setDistanceToOrigin(glm::fvec3{50.0f, 0.0f, 0.0f});
   saturn_geo_ptr->setSpeed(0.13f);
   saturn_geo_ptr->setRadius(1.315f);
-  saturn_geo_ptr->setColor(glm::fvec3{0.9f, 0.75f, 0.54f});
+  saturn_geo_ptr->setColor(glm::fvec3{0.9f, 0.75f, 0.6f});
   saturn_geo_ptr->setTexturePath(m_resource_path + "textures/saturnmap.png");
   // add satur to root
   root_ptr->addChildren(saturn_ptr);
@@ -450,7 +450,7 @@ void ApplicationSolar::init_planets() {
   uranus_geo_ptr->setDistanceToOrigin(glm::fvec3{60.0f, 0.0f, 0.0f});
   uranus_geo_ptr->setSpeed(0.22f);
   uranus_geo_ptr->setRadius(0.94f);
-  uranus_geo_ptr->setColor(glm::fvec3{0.69f, 0.93f, 0.93f});
+  uranus_geo_ptr->setColor(glm::fvec3{0.69f, 0.83f, 0.93f});
   uranus_geo_ptr->setTexturePath(m_resource_path + "textures/uranusmap.png");
   // add uranus to root
   root_ptr->addChildren(uranus_ptr);
@@ -463,7 +463,7 @@ void ApplicationSolar::init_planets() {
   neptune_geo_ptr->setDistanceToOrigin(glm::fvec3{85.0f, 0.0f, 0.0f});
   neptune_geo_ptr->setSpeed(0.3f);
   neptune_geo_ptr->setRadius(1.4f);
-  neptune_geo_ptr->setColor(glm::fvec3{0.69f, 0.93f, 0.93f});
+  neptune_geo_ptr->setColor(glm::fvec3{0.4f, 0.4f, 0.93f});
   neptune_geo_ptr->setTexturePath(m_resource_path + "textures/neptunemap.png");
   // add neptune to root
   root_ptr->addChildren(neptune_ptr);
