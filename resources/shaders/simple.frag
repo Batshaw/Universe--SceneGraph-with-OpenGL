@@ -27,7 +27,7 @@ float shine = 15.0f;      // Intensity of the hightlight
 
 float ambient_intensity = 0.8f;
 float specular_intensity = 0.5f;
-float diffuse_intensity = 0.6f;
+float diffuse_intensity = 0.9f;
 float outline = 1.0f;
 
 void main() {
@@ -44,17 +44,10 @@ void main() {
   // direction of the reflection
   vec3 h = normalize(incoming_ray + camera_ray);
 
-  // Blinn-Phong: (ambient + diffuse) * PlanetColor + specular(Blinn)
+  // Blinn-Phong: (ambient + diffuse) * texture_color + specular(Blinn)
 
-  // float diffuse_light = max(dot(normal_vector, incoming_ray), 0) * LightIntensity;
-  float LightInten = 0.0f;
-  float dot_value = dot(normal_vector, incoming_ray);
-  if (dot_value < 0){
-    LightInten = LightIntensity / 7.0f;
-  }
-  else LightInten = LightIntensity;
-  float diffuse_light = abs(dot(normal_vector, incoming_ray)) * LightInten;
-
+  float diffuse_light = max(dot(normal_vector, incoming_ray), 0) * LightIntensity;
+  
   vec3 diffuse = diffuse_intensity * diffuse_light * texture_color.rgb; /*ambient_color;*/               //diffuse color = ambient color, now use texture color as diffuse color
 
   float specular_light = pow(max(dot(h, normal_vector), 0), shine) * LightIntensity;
@@ -63,10 +56,10 @@ void main() {
   vec3 ambient = ambient_intensity * ambient_color;
   
   if(!CellShadingMode) {
-    out_Color = vec4((ambient + diffuse) * PlanetColor + specular, 1.0f);
+    out_Color = vec4((ambient + diffuse) * texture_color.rgb + specular, 1.0f);
   }
   else {
-    vec3 CellColor = floor(PlanetColor * 3);   // 3 levels of brightness
+    vec3 CellColor = floor(texture_color.rgb * 3);   // 3 levels of brightness
     CellColor = CellColor / 3;
     /*
     if(max(dot(normal_vector, incoming_ray), 0.0f) < 0.05f) {    // outline the vertex if the normal vector and the vector from vertex to camera is almost perpendicular
