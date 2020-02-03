@@ -87,7 +87,7 @@ void ApplicationSolar::render() const {
   // bind FrameBuffer Object, render the SceneGraph to this Object
   glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer_.handle);
   // clear FrameBuffer Attachments before drawing
-  glClearColor(0.1f, 0.023f, 0.26f, 1.0f);
+  glClearColor(0.067f, 0.08f, 0.18f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   std::list<Node*> const our_solar_system = scene_graph->getRoot()->getChildrenList();
@@ -665,10 +665,6 @@ void ApplicationSolar::init_FrameBuffer(unsigned int width, unsigned int height)
   // define which buffer to write
   GLenum draw_buffers[1] = {GL_COLOR_ATTACHMENT0};
   glDrawBuffers(1, draw_buffers);
-  //check if the framebuffer could be written
-  if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE){
-      std::cout << "ERROR, Framebuffer can't be written " << glCheckFramebufferStatus(GL_FRAMEBUFFER) << std::endl;
-  }  
 }
 
 std::vector<GLfloat> quadVertices = {
