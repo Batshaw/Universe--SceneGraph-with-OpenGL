@@ -9,7 +9,7 @@ in vec2 texture_coord;
 // output color
 out vec4 out_Color;
 
-uniform vec3 PlanetColor;
+//uniform vec3 PlanetColor;
 uniform float LightIntensity;
 uniform vec3 LightColor;
 uniform bool CellShadingMode;
@@ -31,6 +31,7 @@ float diffuse_intensity = 0.9f;
 float outline = 1.0f;
 
 void main() {
+  // PlanetColor = vec3(0.0f);
   //out_Color = vec4(abs(normalize(pass_Normal)), 1.0);
   // out_Color = vec4(PlanetColor, 1.0f);
 

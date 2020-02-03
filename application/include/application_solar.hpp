@@ -39,6 +39,10 @@ class ApplicationSolar : public Application {
   void init_orbits();
   // init Texture for planets
   void init_textures();
+  // init  FrameBuffer
+  void init_FrameBuffer(unsigned int width = 850u, unsigned int height = 650u);
+  // init ScreenQuad
+  void init_ScreenQuad();
   // update uniform values
   void uploadUniforms();
   // upload projection matrix
@@ -54,6 +58,7 @@ class ApplicationSolar : public Application {
   void render_planets(std::list<Node*> const& planets_list) const;
   void render_stars() const;
   void render_orbits(Node* const& child_planet) const;
+  void render_ScreenQuad() const;
 
   // compute transform matrix (help function)
   glm::fmat4 compute_transform_matrix(Node* const& planet_ptr) const;
@@ -72,14 +77,21 @@ class ApplicationSolar : public Application {
   model_object planet_object;
   model_object star_object;
   model_object orbit_object;
+  model_object screen_quad_object;
   
   // camera transform matrix
   glm::fmat4 m_view_transform;
   // camera projection matrix
   glm::fmat4 m_view_projection;
 
+  // Frame Buffer Object with a texture as Color Attachment and a Renderbuffer as Depth Attachment
+  texture_object frameBuffer_color_texture_;
+  texture_object renderBuffer_depth_texture_;
+  texture_object frame_buffer_;
+
   // MODE
   bool CellShadingMode;
+  int model_type;
 };
 
 #endif
